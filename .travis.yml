@@ -4,12 +4,23 @@ addons:
   apt:
     packages:
       - nodejs
-install: true # disable travis' default mvn install before running the tests
+install: 
+  - curl https://commbank.artifactoryonline.com/commbank/binaries/ci/ci-$CI_VERSION.tar.gz | tar xz
 scala:
-  - "2.10.4"
+  - 2.10.4
 jdk:
   - openjdk7
-script: mvn clean test package
+script:
+  - ci/ci-nonrelease.sh mvn clean test package
+  - ci/ci-release.sh mvn clean test deploy --settings ./settings.xml -DaltDeploymentRepository=commbank-artifactoryonline::default::https://commbank.artifactoryonline.com/commbank/ext-snapshots-local/
+after_script:
+  - rm -rf ci
 cache:
   directories:
-    - $HOME/.m2/repository
+    - $HOME/.ivy2
+    - $HOME/.m2
+env:
+  global:
+    - CI_VERSION=3.2.2-20160718231250-50a210b
+    - secure: FEEEq8FpdQlQ1J8PCgjGuC6EpknGN6C3eLNd8laoTNKbXKUitVnf3IyaptYxZYGCTYkQgDji2fDQvhxoKmL5P6aaOVxQZ8wL6QlVelrtwjg3H2Jt1j75RRlf8kpAacesP+PyCw3BVeSABVKwop6aY+8fXrW/wZMpl3i2QaNftds3qyBY8prVddvWkZfVmw+UZ5lfoGwDwfNxff20E4gK5ppcIFJ1vttHEEbiOBcfWdIHAZH6Q1nEOJzTFmLFV+YfUV5THsfDRdM8l+WvWcOrOFP5vdjkVARmItKguLnvH6YUC0IdNn/TnqhwmsREmCe1MhVbmEwW66rcZAk19iI63oAjOOCwTi7abE6UNpfBmCepViGYKDN608ach8h//kfPyoY1UNikLZRKlxzhrlrM2lG/LHlwIMZUU6pks3HqtXr18Bb5g0qEvuh9scQkMnPgJfJlZK69yXscPTvF1zEFQJCScE2va6S1Evj43tXBQvhSjCHoB/ZZi/pDi0Zl7cpJtCr4ymsW59lSetB3Kh1cgEFJTZJESnwO0WFxtbaTh9OOhJh2YryXpqGHrriTYZqZGpJJYqKyToBXApgGbAkd8jfQKvZKoQadYqlx7YokzNawZdWO4cx/tv2zY7LIg9luqhBm1zumAQx9aG66Bawm9isKQ48blh7NYZ3OUVIP2QE=
+    - secure: ak3fUZjTUwK87SPLm1wxdTsAp9PNOqKcop4OZiJTcgmzcpcjO2UT83S5ifpl54Xpe3AHM1n0ppz2Vgb3iv4jiJn2Kf+ngS0VykeMtM+q+dVXNqeDqoqo1L4MnvMkCGEaPKBJ4nHaXM9RG6a/2rmiI/UZEs1t6jawLr8a7klFTc/kpN8qFT+abLElFPXhyc8/9Iz4xBxMR8etzxDJxEgwE5dw7qK/YP8lz6mTfh62YC62LyGimcomkl7JBnkpJKfcwaxaVDMJgZWJ4SG0kA8bGpkYVluXHOz1xZJK8Etqal4M6xd7Rh9ircIsLbQor17YSSbd1ZQZEoKJrvlGza4b8sT0NdKNsSTBRjYu8yi2AozQGSDTj09hJyiuE+OFCf8rQVveHkz9QBE84x28pDACfHQsREqi6FwI4WHKiWIeGxFZwYPL1KKD4rHy38i3C7TBNlEKxJwZaCpVBdu+epVTg2ghh1/Z6T4hDYVkOTpnPY5KpALP1XMZJ9wee1iEPxjWzaAEIVv299/t4x9aY4HIlLfxfsPpbtZQZVRlbzvmt+LuGKRMpHTEUaEBti7fOx/ld6qD3t/bUJKv+dxnNWMIsBEWXAOtFnZmpF6o/9jj1DLz9XDZfJhfcCD6nBjfgrxWJjlB8H45Z229cMSwHWYAe6rr9ADkrvZPyhrHOLvnTtc=
